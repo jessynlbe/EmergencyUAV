@@ -36,11 +36,26 @@ public class Controller : MonoBehaviour
         for(int i = 0 ; i < nb_uav ; i++){
             string name = "UAV" + i.ToString();
             uav = GameObject.Find(name);
-            float sizeSector = sizeGround / nb_uav;
-            Vector3 targetVal = new Vector3( topLeftGround + ( (sizeSector * (i+1)) - sizeSector/2) , uav.transform.position.y , ground.transform.position.z);
-            Debug.Log(sizeSector + " " + sizeGround + " " + topLeftGround + " " + targetVal);
 
-            uav.GetComponent<UAV>().setTargetArea(targetVal);
+            float centerX = ground.transform.localScale.x/2;
+            float centerZ = ground.transform.localScale.z/2;
+            float sizeSector = sizeGround / nb_uav;
+            float widthUav = uav.transform.localScale.x;
+            float sizeSectorInUav = sizeSector / widthUav;
+            Vector3 start = new Vector3( topLeftGround + ((sizeSector * i)) , uav.transform.position.y , ground.transform.position.z + (ground.transform.localScale.z / 2) );
+            
+            uav.GetComponent<UAV>().setTargetArea(start);
+
+            for(int j = 0 ; j < (int) sizeSectorInUav ; j++){
+                uav.GetComponent<UAV>().addWayPoints( new Vector3(start.x + (widthUav * j) , 10f , start.z - centerZ ) );
+                uav.GetComponent<UAV>().addWayPoints( new Vector3(start.x + (widthUav * j) , 10f , start.z - centerZ*2) );
+
+                uav.GetComponent<UAV>().addWayPoints( new Vector3(start.x + (widthUav * (j+1) ) , 10f , start.z - centerZ*2) );
+
+                uav.GetComponent<UAV>().addWayPoints( new Vector3(start.x + (widthUav * (j+1) ) , 10f , start.z - centerZ) );
+                uav.GetComponent<UAV>().addWayPoints( new Vector3(start.x + (widthUav * (j+1) ) , 10f , start.z) );
+            }
+
             objects.Add(uav);
         }
 
