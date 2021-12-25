@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using System;
+using UnityEditor;
 public class UAV : MonoBehaviour
 {
     protected Vector3 targetArea;
@@ -11,9 +12,46 @@ public class UAV : MonoBehaviour
     protected Boolean finished;
     protected List<Vector3> wayPoints = new List<Vector3>();
     // Start is called before the first frame update
+
+    public int segments;
+    public float rad;
+    LineRenderer line;
+
     void Start()
     {
+        segments = 50;
+        rad = 3f;
 
+        line = gameObject.GetComponent<LineRenderer>();
+        line.material = new Material(Shader.Find("Sprites/Default"));
+        line.endColor = Color.white;
+        line.startColor = Color.white;
+        line.widthMultiplier = 0.2f;
+        line.positionCount = segments + 1;
+        line.useWorldSpace = false;
+
+        CreatePoints();
+
+
+    }
+
+    void CreatePoints()
+    {
+        float x;
+        float z;
+
+        float angle = 20f;
+
+
+        for (int i = 0; i < (segments + 1); i++)
+        {
+            x = Mathf.Sin(Mathf.Deg2Rad * angle) * rad;
+            z = Mathf.Cos(Mathf.Deg2Rad * angle) * rad;
+
+            line.SetPosition(i, new Vector3(x, 0f, z));
+
+            angle += (380f / segments);
+        }
     }
 
     void Awake(){
@@ -85,4 +123,9 @@ public class UAV : MonoBehaviour
             Debug.Log("Arrived\n");
         }
     }
+
+    public float getRad(){
+        return rad;
+    }
+
 }
