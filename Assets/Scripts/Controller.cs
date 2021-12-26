@@ -9,6 +9,7 @@ public class Controller : MonoBehaviour
 {
     public List<GameObject> objects;
     public List<Vector3> mapPoints = new List<Vector3>();
+    public List<Vector3> donePoints = new List<Vector3>();
     public int nb_uav;
     public GameObject ground;
     public float topLeftGround;
@@ -26,7 +27,7 @@ public class Controller : MonoBehaviour
             for(int i = 0 ; i < objects.Count ; i++){
                 objects[i].GetComponent<UAV>().getWayPoints().Clear();
             }
-            
+            Debug.Log(this.name + " : " + String.Join(", ", donePoints));
             mapPoints.Clear();
             Destroy(objects[0]);
             objects.RemoveAt(0);
@@ -89,15 +90,9 @@ public class Controller : MonoBehaviour
 
 
     void assignWayPoints(float widthVision , float sizeSector , int widthMap , int nbUav ){
-            for(int i = 0 ; i < objects.Count ; i++){
-                float startX = topLeftGround + ((sizeSector * i) + (widthVision/2));
-                float startZ = ground.transform.position.z + (ground.transform.localScale.z / 2);
-                objects[i].GetComponent<UAV>().setTargetArea( new Vector3(startX , 10f , startZ) );
-            }
-            
+
             float nbPerUavF = (float) widthMap / (float) nbUav;
             int nbPerUav = (int) (nbPerUavF + 0.5f);
-            // int nbPerUav = (int) Mathf.Ceil(widthMap / nbUav);
 
             List<int> tabVal = new List<int>(objects.Count);
             for(int i = 0 ; i < objects.Count ; i++){
@@ -115,7 +110,10 @@ public class Controller : MonoBehaviour
                 }
             }
 
-            
+    }
+
+    public List<Vector3> getDonePoints(){
+                return donePoints;
     }
     
 }

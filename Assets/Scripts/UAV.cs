@@ -6,12 +6,10 @@ using System;
 using UnityEditor;
 public class UAV : MonoBehaviour
 {
-    protected Vector3 targetArea;
     protected Boolean altitudeOk;
     protected Boolean startOk;
     protected Boolean finished;
     protected List<Vector3> wayPoints = new List<Vector3>();
-    protected List<Vector3> doneWayPoints = new List<Vector3>();
     public int segments;
     public float rad;
     LineRenderer line;
@@ -71,20 +69,13 @@ public class UAV : MonoBehaviour
         }
         
         if( Input.GetKeyUp(KeyCode.Space)){
-            // printWayPoints();
             Debug.Log(this.name + " : " + String.Join(", ", wayPoints));
-            // Debug.Log(this.name + " : " + wayPoints[0] + " : " + wayPoints[wayPoints.Count-1] + " : " + wayPoints.Count);
         }
 
         float dY = Math.Abs(this.transform.position.y - 10f);
-        float dist = Vector3.Distance(transform.position , targetArea);
 
         if(altitudeOk == false && dY > 0.1){
             move(new Vector3(transform.position.x , 10f , transform.position.z) , 3f);
-        }
-        else if(startOk == false && dist > 0.1){
-            altitudeOk = true;
-            move(targetArea , 10f);
         }
         else if(finished == false && stop == false){
             startOk = true;
@@ -96,15 +87,6 @@ public class UAV : MonoBehaviour
     public void move(Vector3 target , float speed){
         this.transform.position = Vector3.MoveTowards(transform.position , target , speed * Time.deltaTime);
     }
-
-    public Vector3 getTargetArea(){
-        return targetArea;
-    }
-
-    public void setTargetArea(Vector3 target){
-        targetArea = target;
-    }
-
     public List<Vector3> getWayPoints(){
         return wayPoints;
     }
@@ -113,25 +95,16 @@ public class UAV : MonoBehaviour
         wayPoints.Add(value);
     }
 
-    public void printWayPoints(){
-        int size = wayPoints.Count;
-        for(int i = 0 ; i < size ; i++){
-            Debug.Log(this.name + " : " + i + " : " + wayPoints[i]);
-        }
-
-        print("-----------------");
-    }
-
     public void followPath(){
 
         if(wayPoints.Count >= 1){
             float distance = Vector3.Distance(transform.position , wayPoints[0]);
 
             if(distance > 0.1){
-                move(wayPoints[0] , 20f);
+                move(wayPoints[0] , 10f);
             }
             else{
-                doneWayPoints.Add( wayPoints[0] );
+                GameObject.Find("Controller").GetComponent<Controller>().getDonePoints().Add(wayPoints[0]);
                 wayPoints.RemoveAt(0);
             }
         }
@@ -146,7 +119,5 @@ public class UAV : MonoBehaviour
     }
 
 
-    public List<Vector3> getDoneWayPoints(){
-        return doneWayPoints;
-    }
+
 }
