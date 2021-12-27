@@ -4,12 +4,15 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using System;
 using UnityEditor;
+using UnityEngine.UI; // Required when Using UI elements.
 
 public class Controller : MonoBehaviour
 {
     public List<GameObject> objects;
     public List<Vector3> mapPoints = new List<Vector3>();
     public List<Vector3> donePoints = new List<Vector3>();
+
+    public GameObject slider;
     public int nb_uav;
     public GameObject ground;
     public float topLeftGround;
@@ -34,9 +37,18 @@ public class Controller : MonoBehaviour
 
             initMapPoints(3);
         }
+
+        float min = 0;
+        float max = mapPoints.Count-1;
+        float normalizedValue = ( (float) donePoints.Count - min) / (max - min);
+        slider.GetComponent<ProgressBar>().setValue(normalizedValue);
+        // int percentage = (int) (normalizedValue * 100);
+        // Debug.Log( percentage );
     }
 
     void Awake(){
+        slider = GameObject.Find("Slider");
+
         ground = GameObject.Find("Ground");
         nb_uav = 4;
         sizeGround = ground.transform.localScale.x;
@@ -104,13 +116,12 @@ public class Controller : MonoBehaviour
 
         }
 
-        assignWayPoints(widthVision , sizeSector , widthMapInVision, nbUav);
+        assignWayPoints(widthVision , sizeSector , widthMapInVision, heightMapInVision + 1,nbUav);
 
     }
 
 
-    void assignWayPoints(float widthVision , float sizeSector , int widthMap , int nbUav ){
-
+    void assignWayPoints(float widthVision , float sizeSector , int widthMap , int heightMap, int nbUav ){
             float nbPerUavF = (float) widthMap / (float) nbUav;
             int nbPerUav = (int) (nbPerUavF + 0.5f);
 
@@ -124,7 +135,7 @@ public class Controller : MonoBehaviour
 
             int idx = 0;
             for(int i=0 ; i < objects.Count ; i++ ){
-                for(int j  = 0 ; j < tabVal[i]*13 ; j++){
+                for(int j  = 0 ; j < tabVal[i]*heightMap ; j++){
                     if(donePoints.Contains(mapPoints[idx]) == false){
                         objects[i].GetComponent<UAV>().addWayPoints(mapPoints[idx]);
                     }
