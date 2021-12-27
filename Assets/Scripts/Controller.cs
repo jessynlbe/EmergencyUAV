@@ -11,7 +11,6 @@ public class Controller : MonoBehaviour
     public List<GameObject> objects;
     public List<Vector3> mapPoints = new List<Vector3>();
     public List<Vector3> donePoints = new List<Vector3>();
-
     public GameObject slider;
     public int nb_uav;
     public GameObject ground;
@@ -30,7 +29,6 @@ public class Controller : MonoBehaviour
             for(int i = 0 ; i < objects.Count ; i++){
                 objects[i].GetComponent<UAV>().getWayPoints().Clear();
             }
-            Debug.Log(this.name + " : " + String.Join(", ", donePoints));
             mapPoints.Clear();
             Destroy(objects[0]);
             objects.RemoveAt(0);
@@ -42,8 +40,6 @@ public class Controller : MonoBehaviour
         float max = mapPoints.Count-1;
         float normalizedValue = ( (float) donePoints.Count - min) / (max - min);
         slider.GetComponent<ProgressBar>().setValue(normalizedValue);
-        // int percentage = (int) (normalizedValue * 100);
-        // Debug.Log( percentage );
     }
 
     void Awake(){
@@ -81,7 +77,6 @@ public class Controller : MonoBehaviour
         
         float startX = topLeftGround + (widthVision /2) ;
         float startZ = ground.transform.position.z + (ground.transform.localScale.z/2);
-        Debug.Log(heightMapInVision);
 
         for(int j = 0 ; j < (int) widthMapInVision / 2 ; j++){
             
@@ -142,13 +137,15 @@ public class Controller : MonoBehaviour
                     idx++;
                 }
             }
-
-            Debug.Log(String.Join(", " , tabVal));
-
     }
 
     public List<Vector3> getDonePoints(){
         return donePoints;
+    }
+
+
+    public int getNbUav(){
+        return nb_uav;
     }
     
 }
