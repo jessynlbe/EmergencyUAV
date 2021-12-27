@@ -60,6 +60,7 @@ public class Controller : MonoBehaviour
         sizeGround = ground.transform.localScale.x;
         topLeftGround = ground.transform.position.x - (sizeGround / 2);
         idxUav = 0;
+
         
         initUAV();
         initMapPoints(nb_uav);
@@ -89,40 +90,43 @@ public class Controller : MonoBehaviour
         float startX = topLeftGround + (widthVision /2) ;
         float startZ = ground.transform.position.z + (ground.transform.localScale.z/2);
 
-        for(int j = 0 ; j < (int) widthMapInVision / 2 ; j++){
+        for(int j = 0 ; j < widthMapInVision ; j++){
             
-            startZ = ground.transform.position.z + (ground.transform.localScale.z / 2) - objects[0].GetComponent<UAV>().getRad();
+            if( j % 2 == 0){
+                startZ = ground.transform.position.z + (ground.transform.localScale.z / 2) - objects[0].GetComponent<UAV>().getRad();
 
-            mapPoints.Add( new Vector3(startX , 10f , startZ) );
-            int idx = 1;
+                mapPoints.Add( new Vector3(startX , 10f , startZ) );
+                int idx = 1;
 
-            while(idx < heightMapInVision ){
-                mapPoints.Add( new Vector3(startX , 10f , startZ - (idx*objects[0].GetComponent<UAV>().getRad()*2 ) ) ) ;
-                idx++;
+                while(idx < heightMapInVision ){
+                    mapPoints.Add( new Vector3(startX , 10f , startZ - (idx*objects[0].GetComponent<UAV>().getRad()*2 ) ) ) ;
+                    idx++;
+                }
+
+                mapPoints.Add( new Vector3(startX , 10f , ground.transform.position.z - (ground.transform.localScale.z / 2) + objects[0].GetComponent<UAV>().getRad() ) );
+                
             }
-
-            mapPoints.Add( new Vector3(startX , 10f , ground.transform.position.z - (ground.transform.localScale.z / 2) + objects[0].GetComponent<UAV>().getRad() ) );
+            else{
             
-            
-            
-            startX += widthVision;
+                startX += widthVision;
 
-            mapPoints.Add( new Vector3(startX , 10f , ground.transform.position.z - (ground.transform.localScale.z / 2) + objects[0].GetComponent<UAV>().getRad() ) );
+                mapPoints.Add( new Vector3(startX , 10f , ground.transform.position.z - (ground.transform.localScale.z / 2) + objects[0].GetComponent<UAV>().getRad() ) );
 
-            int idx2 = heightMapInVision-1 ;
+                int idx2 = heightMapInVision-1 ;
 
-            while(idx2 > 0 ){
-                mapPoints.Add( new Vector3(startX , 10f , startZ - (idx2 * objects[0].GetComponent<UAV>().getRad()*2 )) );
-                idx2--;
+                while(idx2 > 0 ){
+                    mapPoints.Add( new Vector3(startX , 10f , startZ - (idx2 * objects[0].GetComponent<UAV>().getRad()*2 )) );
+                    idx2--;
+                }
+
+                mapPoints.Add( new Vector3(startX , 10f , startZ) );
+
+                startX += widthVision;
+
             }
-
-            mapPoints.Add( new Vector3(startX , 10f , startZ) );
-
-            startX += widthVision;
 
         }
-
-        assignWayPoints(widthVision , sizeSector , widthMapInVision, heightMapInVision + 1,nbUav);
+        assignWayPoints(widthVision , sizeSector , widthMapInVision, heightMapInVision+1 ,nbUav);
 
     }
 
@@ -133,21 +137,25 @@ public class Controller : MonoBehaviour
 
             List<int> tabVal = new List<int>(objects.Count);
             for(int i = 0 ; i < objects.Count ; i++){
-                if(i == objects.Count - 1 && widthMap % nbPerUav != 0){
-                    nbPerUav = widthMap % nbUav;
-                }
                 tabVal.Add(nbPerUav);
+
+                if(i == objects.Count - 1 ){
+                    tabVal[i] += widthMap % nbPerUav;
+                }
             } 
 
-            int idx = 0;
-            for(int i=idxUav ; i < objects.Count ; i++ ){
-                for(int j  = 0 ; j < tabVal[i]*heightMap ; j++){
-                    if(donePoints.Contains(mapPoints[idx]) == false){
-                        objects[i].GetComponent<UAV>().addWayPoints(mapPoints[idx]);
+            List<Vector3> clonedList = new List<Vector3>(mapPoints);
+            
+            for(int i = idxUav ; i < objects.Count ; i++){
+                for(int j = 0 ; j < tabVal[i]*heightMap ; j++){
+                    if(donePoints.Contains(clonedList[0]) == false){
+                        objects[i].GetComponent<UAV>().addWayPoints(clonedList[0]);
                     }
-                    idx++;
+
+                    clonedList.RemoveAt(0);
                 }
             }
+
     }
 
     public List<Vector3> getDonePoints(){

@@ -94,10 +94,13 @@ public class UAV : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        detectectionPlayer();
+        if(finished == true){
+            move( startPos, 10f );
+        }
 
-        if(manual == 1 && Input.GetKeyUp(KeyCode.Space)){
+        if(this.name == "UAV0" && manual == 1 && Input.GetKeyUp(KeyCode.Space)){
             manual = 0;
+            onHold[0].GetComponent<Renderer>().material.color = Color.green;
             onHold.RemoveAt(0);
             Debug.Log("Automatic");
             controller.GetComponent<Controller>().updateUAV(0 , 4);
@@ -127,11 +130,11 @@ public class UAV : MonoBehaviour
                 move(new Vector3(transform.position.x , altitude , transform.position.z) , 3f);
             }
             else if(finished == false){
+                if(controller.GetComponent<Controller>().getDonePoints().Count > 0){
+                    detectectionPlayer();
+                }
                 startOk = true;
                 followPath();
-            }
-            else if(returnOk == false){
-                // move( startPos, 10f );
             }
 
         }
@@ -178,7 +181,7 @@ public class UAV : MonoBehaviour
             float distance = Vector3.Distance(transform.position , wayPoints[0]);
 
             if(distance > 0.1){
-                move(wayPoints[0] , 10f);
+                move(wayPoints[0] , 30f);
             }
             else{
                 GameObject.Find("Controller").GetComponent<Controller>().getDonePoints().Add(wayPoints[0]);
