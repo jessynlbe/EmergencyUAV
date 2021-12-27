@@ -15,14 +15,21 @@ public class UAV : MonoBehaviour
     protected Boolean returnOk;
     protected List<Vector3> wayPoints = new List<Vector3>();
     protected List<GameObject> detectedPlayers = new List<GameObject>();
+    protected List<GameObject> onHold = new List<GameObject>();
     public int segments;
     public float rad;
+    public float altitude;
     LineRenderer line;
-    public Boolean stop;
 
+    public int manual;
 
     // Start is called before the first frame update
     void Start()
+    {
+        CreatePoints();
+    }
+
+    void CreatePoints()
     {
 
         line = gameObject.GetComponent<LineRenderer>();
@@ -33,11 +40,6 @@ public class UAV : MonoBehaviour
         line.positionCount = segments + 1;
         line.useWorldSpace = false;
 
-        CreatePoints();
-    }
-
-    void CreatePoints()
-    {
         float x;
         float z;
 
@@ -56,13 +58,17 @@ public class UAV : MonoBehaviour
     }
 
     void Awake(){
+
+        //////////// All initialisations ///////////////
         controller = GameObject.Find("Controller");
         startPos = this.transform.position;
         returnOk = false;
         altitudeOk = false;
         segments = 50;
         rad = 2f;
-        stop = false;
+        manual = 0;
+        altitude = 10f;
+
     }
 
     void sendPlayerDetectedToUAV(GameObject player){
@@ -73,17 +79,66 @@ public class UAV : MonoBehaviour
             if(uav != this.gameObject){
                 uav.GetComponent<UAV>().receivePlayerDetected(player);
             }
+
+            if(uav.name == "UAV0" && this.name != "UAV0"){
+                uav.GetComponent<UAV>().addOnHold(player);
+            }
         }
     }
 
     void receivePlayerDetected(GameObject player){
         detectedPlayers.Add(player);
-        Debug.Log(this.name + " : " + "Player data received");
+        // Debug.Log(this.name + " : " + "Player data received");
     }
 
     // Update is called once per frame
     void Update()
     {
+        detectectionPlayer();
+
+        if(manual == 1 && Input.GetKeyUp(KeyCode.Space)){
+            manual = 0;
+            onHold.RemoveAt(0);
+            Debug.Log("Automatic");
+            controller.GetComponent<Controller>().updateUAV(0 , 4);
+        }
+
+        if(this.name == "UAV0" && onHold.Count > 0){
+            if(manual == 0){
+                Debug.Log("Manual");
+                controller.GetComponent<Controller>().updateUAV(1 , 3);
+                manual = 1;
+            }
+            else{
+                Vector3 pos = new Vector3(onHold[0].transform.position.x , altitude - 2f , onHold[0].transform.position.z);
+                move(pos , 20f);
+            }
+        }
+        else{
+
+
+
+            ////////// Movement UAV //////////
+
+            float dY = Math.Abs(this.transform.position.y - altitude);
+            float dist = Math.Abs(Vector3.Distance(startPos , this.transform.position));
+
+            if(altitudeOk == false && dY > 0.1){
+                move(new Vector3(transform.position.x , altitude , transform.position.z) , 3f);
+            }
+            else if(finished == false){
+                startOk = true;
+                followPath();
+            }
+            else if(returnOk == false){
+                // move( startPos, 10f );
+            }
+
+        }
+
+    }
+
+    void detectectionPlayer(){
         RaycastHit hit;
         int layerMask = 1 << 7;
         for(int i = 0 ; i < 360 ; i+=45){
@@ -96,39 +151,14 @@ public class UAV : MonoBehaviour
             if(Physics.Raycast(transform.position , dir , out hit , this.transform.position.y , layerMask)){
                 GameObject player = hit.transform.gameObject;
                 if(detectedPlayers.Contains(player) == false){
+                    if(this.name == "UAV0"){
+                        onHold.Add(player);
+                    }
                     sendPlayerDetectedToUAV(player);
                 }
             }
             Debug.DrawRay(transform.position , dir , Color.green);
         }
-
-        if (Input.GetKeyUp(KeyCode.Escape)){
-            if(stop == false){
-                stop = true;
-            }
-            else{
-                stop = false;
-            }
-        }
-        
-        if( Input.GetKeyUp(KeyCode.Space)){
-            Debug.Log(this.name + " : " + String.Join(", ", wayPoints));
-        }
-
-        float dY = Math.Abs(this.transform.position.y - 10f);
-        float dist = Math.Abs(Vector3.Distance(startPos , this.transform.position));
-
-        if(altitudeOk == false && dY > 0.1){
-            move(new Vector3(transform.position.x , 10f , transform.position.z) , 3f);
-        }
-        else if(finished == false && stop == false){
-            startOk = true;
-            followPath();
-        }
-        else if(returnOk == false){
-            // move( startPos, 10f );
-        }
-
     }
 
     public void move(Vector3 target , float speed){
@@ -148,7 +178,7 @@ public class UAV : MonoBehaviour
             float distance = Vector3.Distance(transform.position , wayPoints[0]);
 
             if(distance > 0.1){
-                move(wayPoints[0] , 20f);
+                move(wayPoints[0] , 10f);
             }
             else{
                 GameObject.Find("Controller").GetComponent<Controller>().getDonePoints().Add(wayPoints[0]);
@@ -166,5 +196,7 @@ public class UAV : MonoBehaviour
     }
 
 
-
+    public void addOnHold(GameObject player){
+        onHold.Add(player);
+    }
 }

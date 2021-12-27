@@ -13,6 +13,7 @@ public class Controller : MonoBehaviour
     public List<Vector3> donePoints = new List<Vector3>();
     public GameObject slider;
     public int nb_uav;
+    public int idxUav;
     public GameObject ground;
     public float topLeftGround;
     public float sizeGround;
@@ -29,10 +30,8 @@ public class Controller : MonoBehaviour
             for(int i = 0 ; i < objects.Count ; i++){
                 objects[i].GetComponent<UAV>().getWayPoints().Clear();
             }
+            idxUav = 1;
             mapPoints.Clear();
-            Destroy(objects[0]);
-            objects.RemoveAt(0);
-
             initMapPoints(3);
         }
 
@@ -42,6 +41,17 @@ public class Controller : MonoBehaviour
         slider.GetComponent<ProgressBar>().setValue(normalizedValue);
     }
 
+    public void updateUAV(int value , int nb){
+        idxUav = value;
+        
+        for(int i = 0 ; i < objects.Count ; i++){
+                objects[i].GetComponent<UAV>().getWayPoints().Clear();
+        }
+
+        mapPoints.Clear();
+        initMapPoints(nb);
+    }
+
     void Awake(){
         slider = GameObject.Find("Slider");
 
@@ -49,6 +59,7 @@ public class Controller : MonoBehaviour
         nb_uav = 4;
         sizeGround = ground.transform.localScale.x;
         topLeftGround = ground.transform.position.x - (sizeGround / 2);
+        idxUav = 0;
         
         initUAV();
         initMapPoints(nb_uav);
@@ -129,7 +140,7 @@ public class Controller : MonoBehaviour
             } 
 
             int idx = 0;
-            for(int i=0 ; i < objects.Count ; i++ ){
+            for(int i=idxUav ; i < objects.Count ; i++ ){
                 for(int j  = 0 ; j < tabVal[i]*heightMap ; j++){
                     if(donePoints.Contains(mapPoints[idx]) == false){
                         objects[i].GetComponent<UAV>().addWayPoints(mapPoints[idx]);

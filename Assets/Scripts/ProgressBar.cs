@@ -4,7 +4,6 @@ using UnityEngine.UI; // Required when Using UI elements.
 
 public class ProgressBar : MonoBehaviour
 {
-
     public Slider slider;
     public Text displayText;
     // Start is called before the first frame update
@@ -14,13 +13,6 @@ public class ProgressBar : MonoBehaviour
         displayText = GameObject.Find("Percentage").GetComponent<Text>();
         slider.value = 0;
     }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
     public void setValue(float value){
         slider.value = value;
         if(slider.value != 1){
