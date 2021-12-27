@@ -59,6 +59,7 @@ public class Controller : MonoBehaviour
 
     void initMapPoints(int nbUav){
         int widthMapInVision = (int) ( (sizeGround / ( objects[0].GetComponent<UAV>().getRad() * 2) ) );
+        int heightMapInVision = (int) (ground.transform.localScale.z / ( objects[0].GetComponent<UAV>().getRad() * 2) );
 
         float centerX = ground.transform.localScale.x/2; // X center of the ground (area to check)
         float centerZ = ground.transform.localScale.z/2; // Z center of the ground (area to check)
@@ -68,21 +69,40 @@ public class Controller : MonoBehaviour
         
         float startX = topLeftGround + (widthVision /2) ;
         float startZ = ground.transform.position.z + (ground.transform.localScale.z/2);
+        Debug.Log(heightMapInVision);
 
         for(int j = 0 ; j < (int) widthMapInVision / 2 ; j++){
+            
+            startZ = ground.transform.position.z + (ground.transform.localScale.z / 2) - objects[0].GetComponent<UAV>().getRad();
+
             mapPoints.Add( new Vector3(startX , 10f , startZ) );
-            mapPoints.Add( new Vector3(startX , 10f , startZ - centerZ) );
-            mapPoints.Add( new Vector3(startX , 10f , startZ - (centerZ *2)) );
+            int idx = 1;
+
+            while(idx < heightMapInVision ){
+                mapPoints.Add( new Vector3(startX , 10f , startZ - (idx*objects[0].GetComponent<UAV>().getRad()*2 ) ) ) ;
+                idx++;
+            }
+
+            mapPoints.Add( new Vector3(startX , 10f , ground.transform.position.z - (ground.transform.localScale.z / 2) + objects[0].GetComponent<UAV>().getRad() ) );
+            
+            
+            
+            startX += widthVision;
+
+            mapPoints.Add( new Vector3(startX , 10f , ground.transform.position.z - (ground.transform.localScale.z / 2) + objects[0].GetComponent<UAV>().getRad() ) );
+
+            int idx2 = heightMapInVision-1 ;
+
+            while(idx2 > 0 ){
+                mapPoints.Add( new Vector3(startX , 10f , startZ - (idx2 * objects[0].GetComponent<UAV>().getRad()*2 )) );
+                idx2--;
+            }
+
+            mapPoints.Add( new Vector3(startX , 10f , startZ) );
 
             startX += widthVision;
 
-            mapPoints.Add( new Vector3(startX , 10f , startZ - (centerZ*2)) );
-            mapPoints.Add( new Vector3(startX , 10f , startZ - centerZ)) ;
-            mapPoints.Add( new Vector3(startX , 10f , startZ ) );
-
-            startX += widthVision;
         }
-
 
         assignWayPoints(widthVision , sizeSector , widthMapInVision, nbUav);
 
@@ -104,16 +124,20 @@ public class Controller : MonoBehaviour
 
             int idx = 0;
             for(int i=0 ; i < objects.Count ; i++ ){
-                for(int j  = 0 ; j < tabVal[i]*3 ; j++){
-                    objects[i].GetComponent<UAV>().addWayPoints(mapPoints[idx]);
+                for(int j  = 0 ; j < tabVal[i]*13 ; j++){
+                    if(donePoints.Contains(mapPoints[idx]) == false){
+                        objects[i].GetComponent<UAV>().addWayPoints(mapPoints[idx]);
+                    }
                     idx++;
                 }
             }
 
+            Debug.Log(String.Join(", " , tabVal));
+
     }
 
     public List<Vector3> getDonePoints(){
-                return donePoints;
+        return donePoints;
     }
     
 }
