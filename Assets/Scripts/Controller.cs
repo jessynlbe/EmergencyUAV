@@ -18,6 +18,11 @@ public class Controller : MonoBehaviour
     public GameObject ground;
     public float topLeftGround;
     public float sizeGround;
+    public float xPos;
+    public float zPos;
+
+    public float xSize;
+    public float zSize;
     // Start is called before the first frame update
     void Start()
     {
@@ -50,12 +55,17 @@ public class Controller : MonoBehaviour
     }
 
     void Awake(){
+        xSize = 100f;
+        zSize = 100f;
+        xPos = 0f;
+        zPos = 0f;
+
         slider = GameObject.Find("Slider");
         communication = GameObject.Find("Communication");
         ground = GameObject.Find("Ground");
         nb_uav = 4;
-        sizeGround = ground.transform.localScale.x;
-        topLeftGround = ground.transform.position.x - (sizeGround / 2);
+        sizeGround = xSize;
+        topLeftGround = xPos - (sizeGround / 2);
         idxUav = 0;
 
         
@@ -76,47 +86,47 @@ public class Controller : MonoBehaviour
 
     void initMapPoints(int nbUav){
         int widthMapInVision = (int) ( (sizeGround / ( objects[0].GetComponent<UAV>().getRad() * 2) ) );
-        int heightMapInVision = (int) (ground.transform.localScale.z / ( objects[0].GetComponent<UAV>().getRad() * 2) );
+        int heightMapInVision = (int) (zSize / ( objects[0].GetComponent<UAV>().getRad() * 2) );
 
-        float centerX = ground.transform.localScale.x/2; // X center of the ground (area to check)
-        float centerZ = ground.transform.localScale.z/2; // Z center of the ground (area to check)
+        float centerX = xSize/2; // X center of the ground (area to check)
+        float centerZ = zSize/2; // Z center of the ground (area to check)
         float sizeSector = sizeGround / nbUav; // width of the area to be monitored by each drone
         float widthVision = objects[0].GetComponent<UAV>().getRad() * 2; // Width of the "vision" of camera on the uav
         float sizeSectorInUav = (sizeSector / widthVision)/2; // Number of return trips of the uav so that it is over the whole area that has been assigned to it, according to the width of vision of its camera. Ex: For a zone of 100 meters wide with a camera that has a vision of 1 meter in diameter, it is necessary to make 50 return trips to have checked the whole zone.
         
         float startX = topLeftGround + (widthVision /2) ;
-        float startZ = ground.transform.position.z + (ground.transform.localScale.z/2);
+        float startZ = zPos + (zSize/2);
 
         for(int j = 0 ; j < widthMapInVision ; j++){
             
             if( j % 2 == 0){
-                startZ = ground.transform.position.z + (ground.transform.localScale.z / 2) - objects[0].GetComponent<UAV>().getRad();
+                startZ = zPos + (zSize / 2) - objects[0].GetComponent<UAV>().getRad();
 
-                mapPoints.Add( new Vector3(startX , 10f , startZ) );
+                mapPoints.Add( new Vector3(startX , 20f , startZ) );
                 int idx = 1;
 
                 while(idx < heightMapInVision ){
-                    mapPoints.Add( new Vector3(startX , 10f , startZ - (idx*objects[0].GetComponent<UAV>().getRad()*2 ) ) ) ;
+                    mapPoints.Add( new Vector3(startX , 20f , startZ - (idx*objects[0].GetComponent<UAV>().getRad()*2 ) ) ) ;
                     idx++;
                 }
 
-                mapPoints.Add( new Vector3(startX , 10f , ground.transform.position.z - (ground.transform.localScale.z / 2) + objects[0].GetComponent<UAV>().getRad() ) );
+                mapPoints.Add( new Vector3(startX , 20f , zPos - (zSize / 2) + objects[0].GetComponent<UAV>().getRad() ) );
                 
             }
             else{
             
                 startX += widthVision;
 
-                mapPoints.Add( new Vector3(startX , 10f , ground.transform.position.z - (ground.transform.localScale.z / 2) + objects[0].GetComponent<UAV>().getRad() ) );
+                mapPoints.Add( new Vector3(startX , 20f , zPos - (zSize / 2) + objects[0].GetComponent<UAV>().getRad() ) );
 
                 int idx2 = heightMapInVision-1 ;
 
                 while(idx2 > 0 ){
-                    mapPoints.Add( new Vector3(startX , 10f , startZ - (idx2 * objects[0].GetComponent<UAV>().getRad()*2 )) );
+                    mapPoints.Add( new Vector3(startX , 20f , startZ - (idx2 * objects[0].GetComponent<UAV>().getRad()*2 )) );
                     idx2--;
                 }
 
-                mapPoints.Add( new Vector3(startX , 10f , startZ) );
+                mapPoints.Add( new Vector3(startX , 20f , startZ) );
 
                 startX += widthVision;
 

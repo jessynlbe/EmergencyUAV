@@ -71,7 +71,7 @@ public class UAV : MonoBehaviour
         segments = 50;
         rad = 2f;
         manual = 0;
-        altitude = 10f;
+        altitude = 20f;
 
         
     }
@@ -137,7 +137,7 @@ public class UAV : MonoBehaviour
 
             if(altitudeOk == false && dY > 0.1){
                 Vector3 target = new Vector3(transform.position.x , altitude , transform.position.z);
-                move(target , 3f);
+                move(target , 10f);
             }
             else if(finished == false){
                 if(controller.GetComponent<Controller>().getDonePoints().Count > 0){
