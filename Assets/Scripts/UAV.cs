@@ -95,6 +95,7 @@ public class UAV : MonoBehaviour
     void Update()
     {
         if(finished == true){
+            transform.LookAt( new Vector3(startPos.x , this.transform.position.y, startPos.z) );
             move( startPos, 10f );
         }
 
@@ -127,7 +128,8 @@ public class UAV : MonoBehaviour
             float dist = Math.Abs(Vector3.Distance(startPos , this.transform.position));
 
             if(altitudeOk == false && dY > 0.1){
-                move(new Vector3(transform.position.x , altitude , transform.position.z) , 3f);
+                Vector3 target = new Vector3(transform.position.x , altitude , transform.position.z);
+                move(target , 3f);
             }
             else if(finished == false){
                 if(controller.GetComponent<Controller>().getDonePoints().Count > 0){
@@ -181,6 +183,7 @@ public class UAV : MonoBehaviour
             float distance = Vector3.Distance(transform.position , wayPoints[0]);
 
             if(distance > 0.1){
+                transform.LookAt(wayPoints[0]);
                 move(wayPoints[0] , 30f);
             }
             else{

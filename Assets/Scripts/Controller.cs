@@ -8,6 +8,7 @@ using UnityEngine.UI; // Required when Using UI elements.
 
 public class Controller : MonoBehaviour
 {
+    public Player prefabPlayer;
     public List<GameObject> objects;
     public List<Vector3> mapPoints = new List<Vector3>();
     public List<Vector3> donePoints = new List<Vector3>();
@@ -20,6 +21,7 @@ public class Controller : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        // Player p = Instantiate(prefabPlayer , new Vector3(0f,0f,0f) , Quaternion.identity);
 
     }
 
