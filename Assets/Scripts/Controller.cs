@@ -8,7 +8,7 @@ using UnityEngine.UI; // Required when Using UI elements.
 
 public class Controller : MonoBehaviour
 {
-    public Player prefabPlayer;
+    public GameObject communication;
     public List<GameObject> objects;
     public List<Vector3> mapPoints = new List<Vector3>();
     public List<Vector3> donePoints = new List<Vector3>();
@@ -21,7 +21,6 @@ public class Controller : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        // Player p = Instantiate(prefabPlayer , new Vector3(0f,0f,0f) , Quaternion.identity);
 
     }
 
@@ -29,12 +28,7 @@ public class Controller : MonoBehaviour
     void Update()
     {
         if( Input.GetKeyUp(KeyCode.R) ){
-            for(int i = 0 ; i < objects.Count ; i++){
-                objects[i].GetComponent<UAV>().getWayPoints().Clear();
-            }
-            idxUav = 1;
-            mapPoints.Clear();
-            initMapPoints(3);
+            // communication.GetComponent<Communication>().addText("adezdez");
         }
 
         float min = 0;
@@ -48,6 +42,7 @@ public class Controller : MonoBehaviour
         
         for(int i = 0 ; i < objects.Count ; i++){
                 objects[i].GetComponent<UAV>().getWayPoints().Clear();
+                objects[i].GetComponent<UAV>().changeTextPoints();
         }
 
         mapPoints.Clear();
@@ -56,7 +51,7 @@ public class Controller : MonoBehaviour
 
     void Awake(){
         slider = GameObject.Find("Slider");
-
+        communication = GameObject.Find("Communication");
         ground = GameObject.Find("Ground");
         nb_uav = 4;
         sizeGround = ground.transform.localScale.x;
@@ -156,6 +151,8 @@ public class Controller : MonoBehaviour
 
                     clonedList.RemoveAt(0);
                 }
+
+                objects[i].GetComponent<UAV>().changeTextPoints();
             }
 
     }

@@ -7,6 +7,8 @@ using UnityEditor;
 
 public class UAV : MonoBehaviour
 {
+    protected GameObject datas;
+    protected GameObject communication;
     protected GameObject controller;
     protected Vector3 startPos;
     protected Boolean altitudeOk;
@@ -58,9 +60,10 @@ public class UAV : MonoBehaviour
     }
 
     void Awake(){
-
         //////////// All initialisations ///////////////
         controller = GameObject.Find("Controller");
+        datas = GameObject.Find("Datas");
+        communication = GameObject.Find("Communication");
         startPos = this.transform.position;
         returnOk = false;
         altitudeOk = false;
@@ -69,11 +72,15 @@ public class UAV : MonoBehaviour
         manual = 0;
         altitude = 10f;
 
+        datas.GetComponent<Datas>().setTextState("Automatic" , getNumberUAV());
     }
 
     void sendPlayerDetectedToUAV(GameObject player){
         detectedPlayers.Add(player);
-
+        if(this.name != "UAV0"){
+            communication.GetComponent<Communication>().addText(this.name + " to UAV0 comes to the position " + player.transform.position.ToString(), Color.red );
+        }
+        
         for(int i = 0 ; i < controller.GetComponent<Controller>().getNbUav() ; i++ ){
             GameObject uav = GameObject.Find("UAV" + i.ToString());
             if(uav != this.gameObject){
@@ -88,7 +95,6 @@ public class UAV : MonoBehaviour
 
     void receivePlayerDetected(GameObject player){
         detectedPlayers.Add(player);
-        // Debug.Log(this.name + " : " + "Player data received");
     }
 
     // Update is called once per frame
@@ -100,18 +106,19 @@ public class UAV : MonoBehaviour
         }
 
         if(this.name == "UAV0" && manual == 1 && Input.GetKeyUp(KeyCode.Space)){
+            communication.GetComponent<Communication>().addText(this.name + " to All :" + "Person in the position "+ onHold[0].transform.position.ToString() +" is saved" , Color.green);
             manual = 0;
             onHold[0].GetComponent<Renderer>().material.color = Color.green;
             onHold.RemoveAt(0);
-            Debug.Log("Automatic");
+            datas.GetComponent<Datas>().setTextState("Automatic" , getNumberUAV());
             controller.GetComponent<Controller>().updateUAV(0 , 4);
         }
 
         if(this.name == "UAV0" && onHold.Count > 0){
             if(manual == 0){
-                Debug.Log("Manual");
                 controller.GetComponent<Controller>().updateUAV(1 , 3);
                 manual = 1;
+                datas.GetComponent<Datas>().setTextState("Manual" , getNumberUAV());
             }
             else{
                 Vector3 pos = new Vector3(onHold[0].transform.position.x , altitude - 2f , onHold[0].transform.position.z);
@@ -143,6 +150,10 @@ public class UAV : MonoBehaviour
 
     }
 
+    int getNumberUAV(){
+        return (int) Char.GetNumericValue(this.name[3]);
+    }
+
     void detectectionPlayer(){
         RaycastHit hit;
         int layerMask = 1 << 7;
@@ -156,6 +167,7 @@ public class UAV : MonoBehaviour
             if(Physics.Raycast(transform.position , dir , out hit , this.transform.position.y , layerMask)){
                 GameObject player = hit.transform.gameObject;
                 if(detectedPlayers.Contains(player) == false){
+                    communication.GetComponent<Communication>().addText(this.name + " to All : " + "injured person detected at " + player.transform.position.ToString() , Color.black);
                     if(this.name == "UAV0"){
                         onHold.Add(player);
                     }
@@ -193,7 +205,9 @@ public class UAV : MonoBehaviour
         }
         else{
             finished = true;
-            Debug.Log("Arrived\n");
+            datas.GetComponent<Datas>().setTextState("Finished" , getNumberUAV());
+            wayPoints.Clear();
+            changeTextPoints();
         }
     }
 
@@ -204,5 +218,16 @@ public class UAV : MonoBehaviour
 
     public void addOnHold(GameObject player){
         onHold.Add(player);
+    }
+
+    public void changeTextPoints(){
+        if(wayPoints.Count >= 2){
+            datas.GetComponent<Datas>().setTextStart(wayPoints[0].ToString() , getNumberUAV());
+            datas.GetComponent<Datas>().setTextEnd(wayPoints[wayPoints.Count -1].ToString() , getNumberUAV());
+        }
+        else{
+            datas.GetComponent<Datas>().setTextStart("" , getNumberUAV());
+            datas.GetComponent<Datas>().setTextEnd("" , getNumberUAV());
+        }
     }
 }
