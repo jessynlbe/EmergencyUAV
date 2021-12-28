@@ -29,6 +29,7 @@ public class UAV : MonoBehaviour
     void Start()
     {
         CreatePoints();
+        datas.GetComponent<Datas>().setTextState("Automatic" , getNumberUAV());
     }
 
     void CreatePoints()
@@ -72,7 +73,7 @@ public class UAV : MonoBehaviour
         manual = 0;
         altitude = 10f;
 
-        datas.GetComponent<Datas>().setTextState("Automatic" , getNumberUAV());
+        
     }
 
     void sendPlayerDetectedToUAV(GameObject player){
