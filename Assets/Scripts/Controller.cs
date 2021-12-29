@@ -26,7 +26,8 @@ public class Controller : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-
+        initUAV();
+        initMapPoints(nb_uav);
     }
 
     // Update is called once per frame
@@ -47,7 +48,6 @@ public class Controller : MonoBehaviour
         
         for(int i = 0 ; i < objects.Count ; i++){
                 objects[i].GetComponent<UAV>().getWayPoints().Clear();
-                objects[i].GetComponent<UAV>().changeTextPoints();
         }
 
         mapPoints.Clear();
@@ -68,9 +68,6 @@ public class Controller : MonoBehaviour
         topLeftGround = xPos - (sizeGround / 2);
         idxUav = 0;
 
-        
-        initUAV();
-        initMapPoints(nb_uav);
     }
 
     void initUAV(){
@@ -102,31 +99,31 @@ public class Controller : MonoBehaviour
             if( j % 2 == 0){
                 startZ = zPos + (zSize / 2) - objects[0].GetComponent<UAV>().getRad();
 
-                mapPoints.Add( new Vector3(startX , 20f , startZ) );
+                mapPoints.Add( new Vector3(startX , objects[0].GetComponent<UAV>().getAltitude() , startZ) );
                 int idx = 1;
 
                 while(idx < heightMapInVision ){
-                    mapPoints.Add( new Vector3(startX , 20f , startZ - (idx*objects[0].GetComponent<UAV>().getRad()*2 ) ) ) ;
+                    mapPoints.Add( new Vector3(startX , objects[0].GetComponent<UAV>().getAltitude() , startZ - (idx*objects[0].GetComponent<UAV>().getRad()*2 ) ) ) ;
                     idx++;
                 }
 
-                mapPoints.Add( new Vector3(startX , 20f , zPos - (zSize / 2) + objects[0].GetComponent<UAV>().getRad() ) );
+                mapPoints.Add( new Vector3(startX , objects[0].GetComponent<UAV>().getAltitude() , zPos - (zSize / 2) + objects[0].GetComponent<UAV>().getRad() ) );
                 
             }
             else{
             
                 startX += widthVision;
 
-                mapPoints.Add( new Vector3(startX , 20f , zPos - (zSize / 2) + objects[0].GetComponent<UAV>().getRad() ) );
+                mapPoints.Add( new Vector3(startX , objects[0].GetComponent<UAV>().getAltitude() , zPos - (zSize / 2) + objects[0].GetComponent<UAV>().getRad() ) );
 
                 int idx2 = heightMapInVision-1 ;
 
                 while(idx2 > 0 ){
-                    mapPoints.Add( new Vector3(startX , 20f , startZ - (idx2 * objects[0].GetComponent<UAV>().getRad()*2 )) );
+                    mapPoints.Add( new Vector3(startX , objects[0].GetComponent<UAV>().getAltitude() , startZ - (idx2 * objects[0].GetComponent<UAV>().getRad()*2 )) );
                     idx2--;
                 }
 
-                mapPoints.Add( new Vector3(startX , 20f , startZ) );
+                mapPoints.Add( new Vector3(startX , objects[0].GetComponent<UAV>().getAltitude() , startZ) );
 
                 startX += widthVision;
 
@@ -162,7 +159,6 @@ public class Controller : MonoBehaviour
                     clonedList.RemoveAt(0);
                 }
 
-                objects[i].GetComponent<UAV>().changeTextPoints();
             }
 
     }

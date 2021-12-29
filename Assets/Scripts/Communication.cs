@@ -23,6 +23,11 @@ public class Communication : MonoBehaviour
     void incrementIdx(){
         if(idxList >= sizeList - 1){
             idxList = 0;
+            for(int i = 0 ; i < sizeList ; i++){
+                textList[i].color = Color.white;
+                textList[i].text = "• ";
+                
+            }
         }
         else{
             idxList++;

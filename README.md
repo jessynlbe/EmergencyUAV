@@ -4,9 +4,11 @@ Le scénario se place dans un contexte d'une zone sinistrée avec potentiellemen
 
 Drônes utilisé dans l'opération ( le rouge est le drône maître ):
 
+<img src="Images/drones.png" width="300">
 
 Une capsule rouge qui fait office de blessé.
 
+<img src="Images/player.png" width="300">
 
 # **Explication du projet**
 
@@ -22,7 +24,6 @@ Le projet contient 5 scripts pour mettre en place l'intégralité du scénario, 
 #### Interface graphique :
 
 - **Communication.cs** : Une zone de texte est présente dans l'UI du scénario sous forme de "tchat" ( des messages s'ecrivent les uns en dessosu des autres et lorsque le bord est atteint les nouveaux messages remplacent les premiers ). Ce "tchat" permet de visualiser les communications entre les drônes , par exemple lorsqu'un drône détecte une personne il prévient tous les drônes de sa position (pour qu'il sache que ce blessé a deja été detecté). Ce script permet de gérer cette zone de texte.
-- **Datas.cs** : Une autre zone de texte est présente sur l'interface graphique , celle-ci sert à donné des informations utiles sur chaque UAV en vol. On peut imaginer que dans notre scénario cette zone de texte + celle de la communication sont affiché sur la tablette des secours pour avoir toutes les informations de la mission en temps réelle. Ce script permet d'avoir les informations de l'état de chaque UAV (Vol automatique , vol manuel ou survole terminé) , la position de départ de sa zone de contrôle et la position de fin de controle ( pour observer l'evolution des zones selon le nombre de drone en surveillance).
 - **ProgressBar.cs** : Ce script permet simplement de contrôler un slider transformé en barre de progression pour permettre de visualiser directement le pourcentage de la zone sinistré déjà survolé. Elle permet de garantir de manière sûr ( la raison sera expliqué plus bas ) que toute la zone a bien été vérifié.
 
 ## Répartition intelligentes des zones
