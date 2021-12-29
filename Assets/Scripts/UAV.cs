@@ -23,6 +23,8 @@ public class UAV : MonoBehaviour
     LineRenderer line;
 
     public int manual;
+    public int controlManual;
+    public GameObject panelCamera;
 
     // Start is called before the first frame update
     void Start()
@@ -69,6 +71,12 @@ public class UAV : MonoBehaviour
         segments = 50;
         rad = 3f;
         manual = 0;        
+        controlManual = 0;
+
+        if(this.name == "UAV0"){
+            panelCamera = GameObject.Find("PanelCamera");
+            panelCamera.SetActive(false);
+        }
         
     }
 
@@ -105,9 +113,11 @@ public class UAV : MonoBehaviour
         if(this.name == "UAV0" && manual == 1 && Input.GetKeyUp(KeyCode.Space)){
             communication.GetComponent<Communication>().addText(this.name + " to All :" + "Person in the position "+ onHold[0].transform.position.ToString() +" is saved" , Color.green);
             manual = 0;
+            controlManual = 0;
             onHold[0].GetComponent<Renderer>().material.color = Color.green;
             onHold.RemoveAt(0);
             controller.GetComponent<Controller>().updateUAV(0 , 4);
+            panelCamera.SetActive(false);
         }
 
         if(this.name == "UAV0" && onHold.Count > 0){
@@ -115,9 +125,28 @@ public class UAV : MonoBehaviour
                 controller.GetComponent<Controller>().updateUAV(1 , 3);
                 manual = 1;
             }
-            else{
-                Vector3 pos = new Vector3(onHold[0].transform.position.x , altitude - 2f , onHold[0].transform.position.z);
+            
+            Vector3 pos = new Vector3(onHold[0].transform.position.x , altitude - 2f , onHold[0].transform.position.z);
+            float dist = Vector3.Distance(this.transform.position , pos);
+            if(dist < 0.05){
+                controlManual = 1;
+                panelCamera.SetActive(true);
+            }
+            else if(controlManual == 0){
                 move(pos , 20f);
+            }
+
+            if( Input.GetKey(KeyCode.UpArrow) && controlManual == 1){
+                this.transform.position += Vector3.forward * Time.deltaTime * 10f;
+            }
+            else if( Input.GetKey(KeyCode.DownArrow) && controlManual == 1 ){
+                this.transform.position += Vector3.back * Time.deltaTime * 10f;
+            }
+            else if( Input.GetKey(KeyCode.LeftArrow) && controlManual == 1 ){
+                this.transform.position += Vector3.left * Time.deltaTime * 10f;
+            }
+            else if( Input.GetKey(KeyCode.RightArrow) && controlManual == 1 ){
+                this.transform.position += Vector3.right * Time.deltaTime * 10f;
             }
         }
         else{
@@ -152,24 +181,27 @@ public class UAV : MonoBehaviour
     void detectectionPlayer(){
         RaycastHit hit;
         int layerMask = 1 << 7;
-        for(int i = 0 ; i < 360 ; i+=45){
-            float x = getRad() * Mathf.Cos(Mathf.Deg2Rad * i);
-            float z = getRad() * Mathf.Sin(Mathf.Deg2Rad * i);
 
-            Vector3 point = new Vector3(this.transform.position.x + x , 0f , this.transform.position.z + z);
-            Vector3 dir = point - transform.position;
+        for(int j =(int) getRad() ; j >= 0 ; j--){
+            for(int i = 0 ; i < 360 ; i+=45){
+                float x = j * Mathf.Cos(Mathf.Deg2Rad * i);
+                float z = j * Mathf.Sin(Mathf.Deg2Rad * i);
 
-            if(Physics.Raycast(transform.position , dir , out hit , this.transform.position.y , layerMask)){
-                GameObject player = hit.transform.gameObject;
-                if(detectedPlayers.Contains(player) == false){
-                    communication.GetComponent<Communication>().addText(this.name + " to All : " + "injured person detected at " + player.transform.position.ToString() , Color.white);
-                    if(this.name == "UAV0"){
-                        onHold.Add(player);
+                Vector3 point = new Vector3(this.transform.position.x + x , 0f , this.transform.position.z + z);
+                Vector3 dir = point - transform.position;
+
+                if(Physics.Raycast(transform.position , dir , out hit , this.transform.position.y , layerMask)){
+                    GameObject player = hit.transform.gameObject;
+                    if(detectedPlayers.Contains(player) == false){
+                        communication.GetComponent<Communication>().addText(this.name + " to All : " + "injured person detected at " + player.transform.position.ToString() , Color.white);
+                        if(this.name == "UAV0"){
+                            onHold.Add(player);
+                        }
+                        sendPlayerDetectedToUAV(player);
                     }
-                    sendPlayerDetectedToUAV(player);
                 }
+                Debug.DrawRay(transform.position , dir , Color.green);
             }
-            Debug.DrawRay(transform.position , dir , Color.green);
         }
 
         Vector3 center = new Vector3(this.transform.position.x , startPos.y , this.transform.position.z);

@@ -23,6 +23,7 @@ public class Controller : MonoBehaviour
 
     public float xSize;
     public float zSize;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -69,6 +70,7 @@ public class Controller : MonoBehaviour
         idxUav = 0;
 
     }
+
 
     void initUAV(){
         GameObject uav;
