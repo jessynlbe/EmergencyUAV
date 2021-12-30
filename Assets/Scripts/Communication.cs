@@ -20,14 +20,18 @@ public class Communication : MonoBehaviour
         }
     }
 
-    void incrementIdx(){
-        if(idxList >= sizeList - 1){
-            idxList = 0;
-            for(int i = 0 ; i < sizeList ; i++){
+    void clean(int start){
+        for(int i = start ; i < sizeList ; i++){
                 textList[i].color = Color.white;
                 textList[i].text = "• ";
                 
-            }
+        }
+    }
+
+    void incrementIdx(){
+        if(idxList >= sizeList - 1){
+            idxList = 0;
+            clean(0);
         }
         else{
             idxList++;

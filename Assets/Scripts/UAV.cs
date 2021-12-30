@@ -33,6 +33,7 @@ public class UAV : MonoBehaviour
         CreatePoints();
     }
 
+    // Creating a circle around the drone
     void CreatePoints()
     {
 
@@ -82,6 +83,7 @@ public class UAV : MonoBehaviour
         progressBar = GameObject.Find("Slider");
     }
 
+    // Simulation of a communication between drones, when a drone detects a person it sends its position to other drones
     void sendPlayerDetectedToUAV(GameObject player){
         detectedPlayers.Add(player);
         if(this.name != "UAV0"){
@@ -107,8 +109,8 @@ public class UAV : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
-        
+        // When each drone has finished flying over its area it returns to its take-off point, 
+        // except for the master drone which waits until the area has been flown over 100% to be sure that all casualties have been detected   
         if(finished == true){
             if(this.name == "UAV0"){
                 if(progressBar.GetComponent<ProgressBar>().getValue() == 1f ){
@@ -122,9 +124,9 @@ public class UAV : MonoBehaviour
             }
         }
         
-
+        // Modification required to switch the drone back to automatic 
         if(this.name == "UAV0" && manual == 1 && Input.GetKeyUp(KeyCode.Space)){
-            communication.GetComponent<Communication>().addText(this.name + " to All :" + "Person in the position "+ onHold[0].transform.position.ToString() +" is saved" , Color.green);
+            communication.GetComponent<Communication>().addText(this.name + " to All :" + "Saved at "+ onHold[0].transform.position.ToString() , Color.green);
             manual = 0;
             controlManual = 0;
             onHold[0].GetComponent<Renderer>().material.color = Color.green;
@@ -133,6 +135,7 @@ public class UAV : MonoBehaviour
             panelCamera.SetActive(false);
         }
 
+        // Part of the code that takes the master drone over a detected casualty and when it is over the hand over to the rescue
         if(this.name == "UAV0" && onHold.Count > 0){
             if(manual == 0){
                 controller.GetComponent<Controller>().updateUAV(1 , 3);
@@ -192,6 +195,8 @@ public class UAV : MonoBehaviour
         return (int) Char.GetNumericValue(this.name[3]);
     }
 
+    // Person detection function via Raycast, the lasers are sent in a cone shape using a polar to cartesian conversion. 
+    //Several cones are present from the maximum radius equal to the field of view of the drone "rad" to 0 
     void detectectionPlayer(){
         RaycastHit hit;
         int layerMask = 1 << 7;
@@ -217,20 +222,6 @@ public class UAV : MonoBehaviour
                 Debug.DrawRay(transform.position , dir , Color.green);
             }
         }
-
-        // Vector3 center = new Vector3(this.transform.position.x , startPos.y , this.transform.position.z);
-        // Vector3 dir2 = center - transform.position;
-        // if(Physics.Raycast(transform.position , dir2 , out hit , 100f , layerMask)){
-        //         GameObject player = hit.transform.gameObject;
-        //         if(detectedPlayers.Contains(player) == false){
-        //             communication.GetComponent<Communication>().addText(this.name + " to All : " + "injured person detected at " + player.transform.position.ToString() , Color.black);
-        //             if(this.name == "UAV0"){
-        //                 onHold.Add(player);
-        //             }
-        //             sendPlayerDetectedToUAV(player);
-        //         }
-        //     }
-        // Debug.DrawRay(transform.position , dir2 , Color.green);
     }
 
     public void move(Vector3 target , float speed){
@@ -244,6 +235,7 @@ public class UAV : MonoBehaviour
         wayPoints.Add(value);
     }
 
+    // Function that allows the drone to move in its surveillance area, each time it reaches a checkpoint it moves to the next
     public void followPath(){
 
         if(wayPoints.Count >= 1){

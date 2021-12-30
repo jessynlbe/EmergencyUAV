@@ -45,6 +45,7 @@ public class Controller : MonoBehaviour
         slider.GetComponent<ProgressBar>().setValue(normalizedValue);
     }
 
+    // Function that allows to update the checkpoints of each drone when the master drone leaves the surveillance
     public void updateUAV(int value , int nb){
         idxUav = value;
         
@@ -85,6 +86,7 @@ public class Controller : MonoBehaviour
 
     }
 
+    // Calculates all the positions of the area to generate a map that will be used for trajectories
     void initMapPoints(int nbUav){
         int widthMapInVision = (int) ( (sizeGround / ( objects[0].GetComponent<UAV>().getRad() * 2) ) );
         int heightMapInVision = (int) (zSize / ( objects[0].GetComponent<UAV>().getRad() * 2) );
@@ -138,7 +140,7 @@ public class Controller : MonoBehaviour
 
     }
 
-
+    // Assign map points between drones
     void assignWayPoints(float widthVision , float sizeSector , int widthMap , int heightMap, int nbUav ){
             float nbPerUavF = (float) widthMap / (float) nbUav;
             int nbPerUav = (int) (nbPerUavF + 0.5f);

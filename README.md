@@ -4,11 +4,15 @@ Le scénario se place dans un contexte d'une zone sinistrée avec potentiellemen
 
 Drônes utilisé dans l'opération ( le rouge est le drône maître ):
 
-<img src="Images/drones.png" width="300">
+<img src="Images/drones.png">
 
-Une capsule rouge qui fait office de blessé.
+Une capsule rouge qui fait office de blessé:
 
-<img src="Images/player.png" width="300">
+<img src="Images/player.png" width="200">
+
+Demonstration du scénario:
+
+![alt text](Images/simulation.gif)
 
 # **Explication du projet**
 
@@ -18,13 +22,13 @@ Le projet contient 5 scripts pour mettre en place l'intégralité du scénario, 
 
 #### Contrôle des drônes :
 
-- **Controller.cs** : Ce script permet de gérer tous les drônes présent sur le site du scénario, il peut être comparé à un ordinateur de contrôle au sol. Son rôle est d'assigner aux drônes leur zone de survole et de les recalculer chaque fois que cela est nécessaire.
-- **UAV.cs** : Il s'agit du script du drône lui même. Il gère les différentes phases de déplacement du drône , monter en altitude , parcourt de sa zone , communication entre les drônes et détection des blessés via des raycast.
+- **Controller.cs --> Controller** : Ce script permet de gérer tous les drônes présent sur le site du scénario, il peut être comparé à un ordinateur de contrôle au sol. Son rôle est d'assigner aux drônes leur zone de survole et de les recalculer chaque fois que cela est nécessaire.
+- **UAV.cs --> UAV** : Il s'agit du script du drône lui même. Il gère les différentes phases de déplacement du drône , monter en altitude , parcourt de sa zone , communication entre les drônes et détection des blessés via des raycast.
 
 #### Interface graphique :
 
-- **Communication.cs** : Une zone de texte est présente dans l'UI du scénario sous forme de "tchat" ( des messages s'ecrivent les uns en dessosu des autres et lorsque le bord est atteint les nouveaux messages remplacent les premiers ). Ce "tchat" permet de visualiser les communications entre les drônes , par exemple lorsqu'un drône détecte une personne il prévient tous les drônes de sa position (pour qu'il sache que ce blessé a deja été detecté). Ce script permet de gérer cette zone de texte.
-- **ProgressBar.cs** : Ce script permet simplement de contrôler un slider transformé en barre de progression pour permettre de visualiser directement le pourcentage de la zone sinistré déjà survolé. Elle permet de garantir de manière sûr ( la raison sera expliqué plus bas ) que toute la zone a bien été vérifié.
+- **Communication.cs --> Communication** : Une zone de texte est présente dans l'UI du scénario sous forme de "tchat" ( des messages s'ecrivent les uns en dessosu des autres et lorsque le bord est atteint les nouveaux messages remplacent les premiers ). Ce "tchat" permet de visualiser les communications entre les drônes , par exemple lorsqu'un drône détecte une personne il prévient tous les drônes de sa position (pour qu'il sache que ce blessé a deja été detecté). Ce script permet de gérer cette zone de texte.
+- **ProgressBar.cs --> Slider** : Ce script permet simplement de contrôler un slider transformé en barre de progression pour permettre de visualiser directement le pourcentage de la zone sinistré déjà survolé. Elle permet de garantir de manière sûr ( la raison sera expliqué plus bas ) que toute la zone a bien été vérifié.
 
 ## Répartition intelligentes des zones
 
@@ -46,3 +50,14 @@ Chaque fois qu'un drône détecte un blessé il demande au drone maitre de venir
 ## Communications entre les drônes
 
 Comme expliqué brievement plus haut , toutes les communications entre les drônes concernent la détection de personnes. Chaque fois qu'un uav détecte quelque chose , il envoie sa position à tous les autres et en plus "demande" au drône maître de venir sur place. On peut facilement observer ces communications dans l'UI. 
+
+## Présentation du concept des Scènes Unity
+
+Les scènes dans Unity sont les "objets" qui vont contenir tout le contenu du jeu / simulation ... que l'on souhaite créer. Elles vont contenir les joueurs , l'environnement , l'interface graphique etc , et le nombre de scènes dans chaque projet va dépendre des besoins et du niveau de complexité du projet . Il est tout à fait possible de tout combiner dans une seul scène pour un petit jeu 2D par exemple ou faire plusieurs scènes pour un jeu à plusieurs niveaux, chaque scène contenant un niveau avec son environnement , son interface , ses joueurs.
+
+Lors de la création d'une nouveau projet , Unity créer de base une scène contenant une caméra et une lumière. On peut facilement en créer une nouvelle avec "Clic droit et New Scene". Pour interagir avec les scènes durant le jeu, il faut connaître les concepts de changement de scène depuis les scripts.
+
+Il existe 2 types de changement de scène :
+
+- Le changement de scène normal : Pour le réaliser il faut utiliser la fontion SceneManager.LoadScene(nomDeLaScene), il faut savoir qu'étant donné que ce mode change complètement la scène , l'actuelle est détruite pour charger la nouvelle. De ce fait , tout ce qui était dans la scène est détruit. il existe différentes façons de conserver certains objets entre les scènes si les besoins le demande. Il est possible de créer une classe statique qui contiendra les données que l'on veut conserver entre les scènes , il suffira de directement appeler la donnée pour l'utiliser comme ceci : MaClasse.MaDonnée, cela ne fonctionne que pour les données de type simple comme les int , string etc pas pour les objets. Pour ceux ci, il faut utiliser la fonction DontDestroyOnLoad(MonObjet) qui va permettre d'empêcher la destruction de l'objet, il se retrouvera présent dans la nouvelle scène.
+- Le changement de scène dit "additive" : Contrairement au précèdent ce changement de scène ne détruit pas la scène courante mais ajoute la nouvelle par dessus l'autre , l'utilisation de contenu entre les scènes est alors simple mais ceux ci se superposent , étant donné que la scène se met par dessus l'autre on peut voir la première scène en fond.
