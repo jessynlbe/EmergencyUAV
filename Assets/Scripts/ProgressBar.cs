@@ -22,4 +22,8 @@ public class ProgressBar : MonoBehaviour
             displayText.text = "100";
         }
     }
+
+    public float getValue(){
+        return slider.value;
+    }
 }

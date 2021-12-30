@@ -25,6 +25,7 @@ public class UAV : MonoBehaviour
     public int manual;
     public int controlManual;
     public GameObject panelCamera;
+    public GameObject progressBar;
 
     // Start is called before the first frame update
     void Start()
@@ -77,7 +78,8 @@ public class UAV : MonoBehaviour
             panelCamera = GameObject.Find("PanelCamera");
             panelCamera.SetActive(false);
         }
-        
+
+        progressBar = GameObject.Find("Slider");
     }
 
     void sendPlayerDetectedToUAV(GameObject player){
@@ -105,10 +107,21 @@ public class UAV : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        
+        
         if(finished == true){
-            transform.LookAt( new Vector3(startPos.x , this.transform.position.y, startPos.z) );
-            move( startPos, 30f );
+            if(this.name == "UAV0"){
+                if(progressBar.GetComponent<ProgressBar>().getValue() == 1f ){
+                    transform.LookAt( new Vector3(startPos.x , this.transform.position.y, startPos.z) );
+                    move( startPos, 30f );
+                }
+            }
+            else{
+                transform.LookAt( new Vector3(startPos.x , this.transform.position.y, startPos.z) );
+                move( startPos, 30f );
+            }
         }
+        
 
         if(this.name == "UAV0" && manual == 1 && Input.GetKeyUp(KeyCode.Space)){
             communication.GetComponent<Communication>().addText(this.name + " to All :" + "Person in the position "+ onHold[0].transform.position.ToString() +" is saved" , Color.green);
@@ -128,6 +141,7 @@ public class UAV : MonoBehaviour
             
             Vector3 pos = new Vector3(onHold[0].transform.position.x , altitude - 2f , onHold[0].transform.position.z);
             float dist = Vector3.Distance(this.transform.position , pos);
+            
             if(dist < 0.05){
                 controlManual = 1;
                 panelCamera.SetActive(true);
@@ -204,19 +218,19 @@ public class UAV : MonoBehaviour
             }
         }
 
-        Vector3 center = new Vector3(this.transform.position.x , startPos.y , this.transform.position.z);
-        Vector3 dir2 = center - transform.position;
-        if(Physics.Raycast(transform.position , dir2 , out hit , 100f , layerMask)){
-                GameObject player = hit.transform.gameObject;
-                if(detectedPlayers.Contains(player) == false){
-                    communication.GetComponent<Communication>().addText(this.name + " to All : " + "injured person detected at " + player.transform.position.ToString() , Color.black);
-                    if(this.name == "UAV0"){
-                        onHold.Add(player);
-                    }
-                    sendPlayerDetectedToUAV(player);
-                }
-            }
-        Debug.DrawRay(transform.position , dir2 , Color.green);
+        // Vector3 center = new Vector3(this.transform.position.x , startPos.y , this.transform.position.z);
+        // Vector3 dir2 = center - transform.position;
+        // if(Physics.Raycast(transform.position , dir2 , out hit , 100f , layerMask)){
+        //         GameObject player = hit.transform.gameObject;
+        //         if(detectedPlayers.Contains(player) == false){
+        //             communication.GetComponent<Communication>().addText(this.name + " to All : " + "injured person detected at " + player.transform.position.ToString() , Color.black);
+        //             if(this.name == "UAV0"){
+        //                 onHold.Add(player);
+        //             }
+        //             sendPlayerDetectedToUAV(player);
+        //         }
+        //     }
+        // Debug.DrawRay(transform.position , dir2 , Color.green);
     }
 
     public void move(Vector3 target , float speed){
@@ -261,5 +275,9 @@ public class UAV : MonoBehaviour
 
     public float getAltitude(){
         return altitude;
+    }
+
+    public Boolean getFinished(){
+        return finished;
     }
 }

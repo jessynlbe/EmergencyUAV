@@ -20,7 +20,6 @@ public class Controller : MonoBehaviour
     public float sizeGround;
     public float xPos;
     public float zPos;
-
     public float xSize;
     public float zSize;
 
@@ -34,8 +33,10 @@ public class Controller : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if( Input.GetKeyUp(KeyCode.R) ){
-            // communication.GetComponent<Communication>().addText("adezdez");
+
+        if( Input.GetKeyUp(KeyCode.S) ){
+            GameObject.Find("textStart").SetActive(false);
+            Time.timeScale = 1f;
         }
 
         float min = 0;
@@ -69,6 +70,7 @@ public class Controller : MonoBehaviour
         topLeftGround = xPos - (sizeGround / 2);
         idxUav = 0;
 
+        Time.timeScale = 0f;
     }
 
 
@@ -173,5 +175,7 @@ public class Controller : MonoBehaviour
     public int getNbUav(){
         return nb_uav;
     }
+
+    
     
 }
