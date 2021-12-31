@@ -65,3 +65,8 @@ Il existe 2 types de changement de scène :
 
 - Le changement de scène normal : Pour le réaliser il faut utiliser la fontion ```SceneManager.LoadScene(nomDeLaScene)```, il faut savoir qu'étant donné que ce mode change complètement la scène , l'actuelle est détruite pour charger la nouvelle. De ce fait , tout ce qui était dans la scène est détruit. il existe différentes façons de conserver certains objets entre les scènes si les besoins le demande. Il est possible de créer une classe statique qui contiendra les données que l'on veut conserver entre les scènes , il suffira de directement appeler la donnée pour l'utiliser comme ceci : ```MaClasse.MaDonnée```, cela ne fonctionne que pour les données de type simple comme les int , string etc pas pour les objets. Pour ceux ci, il faut utiliser la fonction ```DontDestroyOnLoad(MonObjet)``` qui va permettre d'empêcher la destruction de l'objet, il se retrouvera présent dans la nouvelle scène.
 - Le changement de scène dit "additive" : Contrairement au précèdent ce changement de scène ne détruit pas la scène courante mais ajoute la nouvelle par dessus l'autre , l'utilisation de contenu entre les scènes est alors simple mais ceux ci se superposent , étant donné que la scène se met par dessus l'autre on peut voir la première scène en fond.
+
+## Sources
+
+https://assetstore.unity.com/packages/3d/vegetation/environment-pack-free-forest-sample-168396 : Lien asset store que j'ai utilisé pour les arbres et les pierres
+https://assetstore.unity.com/packages/3d/vehicles/air/simple-drone-190684 : Lien asset store que j'ai utilisé pour les drones
