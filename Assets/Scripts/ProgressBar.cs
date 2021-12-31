@@ -13,6 +13,8 @@ public class ProgressBar : MonoBehaviour
         displayText = GameObject.Find("Percentage").GetComponent<Text>();
         slider.value = 0;
     }
+
+    
     public void setValue(float value){
         slider.value = value;
         if(slider.value != 1){

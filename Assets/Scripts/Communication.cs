@@ -6,9 +6,9 @@ using UnityEngine.UI; // Required when Using UI elements.
 
 public class Communication : MonoBehaviour
 {
-    public List<Text> textList = new List<Text>();
+    public List<Text> textList = new List<Text>(); // Lists of text components of the communication panel
     public int sizeList ;
-    public int idxList;
+    public int idxList; // index of the next text component to be changed
     // Start is called before the first frame update
     void Start()
     {

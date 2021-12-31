@@ -8,20 +8,19 @@ using UnityEngine.UI; // Required when Using UI elements.
 
 public class Controller : MonoBehaviour
 {
-    public GameObject communication;
-    public List<GameObject> objects;
-    public List<Vector3> mapPoints = new List<Vector3>();
-    public List<Vector3> donePoints = new List<Vector3>();
-    public GameObject slider;
-    public int nb_uav;
-    public int idxUav;
-    public GameObject ground;
-    public float topLeftGround;
-    public float sizeGround;
-    public float xPos;
-    public float zPos;
-    public float xSize;
-    public float zSize;
+    public GameObject communication; // Object that controls the communication interface
+    public List<GameObject> objects; // List of drones present for the mission
+    public List<Vector3> mapPoints = new List<Vector3>(); // List of map positions (each point of the area to complete it at 100%)
+    public List<Vector3> donePoints = new List<Vector3>(); // List of checkpoints already flown over
+    public GameObject slider; // Object to control the progress bar 
+    public int nb_uav; // Number of uav
+    public int idxUav; // Index or start in the list of drones for surveillance
+    public float topLeftGround; // Position x top left of the area to hover
+    public float sizeGround; // size of the area to hover
+    public float xPos; // Position x of the center of the zone
+    public float zPos; // Position z of the center of the zone
+    public float xSize; // With of the area to hover
+    public float zSize; // Height of the area to hover
 
     // Start is called before the first frame update
     void Start()
@@ -46,6 +45,8 @@ public class Controller : MonoBehaviour
     }
 
     // Function that allows to update the checkpoints of each drone when the master drone leaves the surveillance
+    // value : Starting value of the drone index in the list (1 when the master drone is in manual mode, 0 when it is also monitoring)
+    // nb : Number of drone on which to repartition the area
     public void updateUAV(int value , int nb){
         idxUav = value;
         
@@ -65,7 +66,6 @@ public class Controller : MonoBehaviour
 
         slider = GameObject.Find("Slider");
         communication = GameObject.Find("Communication");
-        ground = GameObject.Find("Ground");
         nb_uav = 4;
         sizeGround = xSize;
         topLeftGround = xPos - (sizeGround / 2);
@@ -87,6 +87,7 @@ public class Controller : MonoBehaviour
     }
 
     // Calculates all the positions of the area to generate a map that will be used for trajectories
+    // nbUav : Number of drone on which to repartition the area
     void initMapPoints(int nbUav){
         int widthMapInVision = (int) ( (sizeGround / ( objects[0].GetComponent<UAV>().getRad() * 2) ) );
         int heightMapInVision = (int) (zSize / ( objects[0].GetComponent<UAV>().getRad() * 2) );
@@ -136,12 +137,16 @@ public class Controller : MonoBehaviour
             }
 
         }
-        assignWayPoints(widthVision , sizeSector , widthMapInVision, heightMapInVision+1 ,nbUav);
+        assignWayPoints(widthVision , widthMapInVision, heightMapInVision+1 ,nbUav);
 
     }
 
     // Assign map points between drones
-    void assignWayPoints(float widthVision , float sizeSector , int widthMap , int heightMap, int nbUav ){
+    // widthVision : Width of the field of view of the drone (diameter of the circle)
+    // widthMap : Width of the map in unit of field of view of the drone (Example : 6 circles to make the whole width)
+    // heightMap : Same widthMap but with height
+    // nbUav : Number of drone on which to repartition the area
+    void assignWayPoints(float widthVision , int widthMap , int heightMap, int nbUav ){
             float nbPerUavF = (float) widthMap / (float) nbUav;
             int nbPerUav = (int) (nbPerUavF + 0.5f);
 
@@ -178,6 +183,4 @@ public class Controller : MonoBehaviour
         return nb_uav;
     }
 
-    
-    
 }

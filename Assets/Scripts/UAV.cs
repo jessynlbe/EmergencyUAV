@@ -7,24 +7,21 @@ using UnityEditor;
 
 public class UAV : MonoBehaviour
 {
-    protected GameObject communication;
-    protected GameObject controller;
-    protected Vector3 startPos;
-    protected Boolean altitudeOk;
-    protected Boolean startOk;
-    protected Boolean finished;
-    protected Boolean returnOk;
-    protected List<Vector3> wayPoints = new List<Vector3>();
-    protected List<GameObject> detectedPlayers = new List<GameObject>();
-    protected List<GameObject> onHold = new List<GameObject>();
-    public int segments;
-    public float rad;
-    public float altitude;
-    LineRenderer line;
-
-    public int manual;
+    protected GameObject communication; // Object that controls the communication interface
+    protected GameObject controller; // Object that controls the controller (control computer)
+    protected Vector3 startPos; // Starting position of the drone
+    protected Boolean altitudeOk; // True when the drone has reached the required altitude
+    protected Boolean finished; // True when the drone flew over its entire area
+    protected List<Vector3> wayPoints = new List<Vector3>(); // List of checkpoints in the drone zone
+    protected List<GameObject> detectedPlayers = new List<GameObject>(); // List of detected player
+    protected List<GameObject> onHold = new List<GameObject>(); // List for the master drone, it contains the injured to go see
+    public int segments; // Useful for the creation of the circle around the drone
+    public float rad; // Radius of the circle
+    public float altitude; // Altitude on which the drone must be placed
+    LineRenderer line; // Useful for the creation of the circle around the drone
+    public int manual; // True if the master drone is in manual mode
     public int controlManual;
-    public GameObject panelCamera;
+    public GameObject panelCamera; // Camera under the master drone display when in manual mode
     public GameObject progressBar;
 
     // Start is called before the first frame update
@@ -68,7 +65,6 @@ public class UAV : MonoBehaviour
         communication = GameObject.Find("Communication");
         startPos = this.transform.position;
         altitude = startPos.y + 20f;
-        returnOk = false;
         altitudeOk = false;
         segments = 50;
         rad = 3f;
@@ -84,6 +80,7 @@ public class UAV : MonoBehaviour
     }
 
     // Simulation of a communication between drones, when a drone detects a person it sends its position to other drones
+    // player : Person detected by the uav
     void sendPlayerDetectedToUAV(GameObject player){
         detectedPlayers.Add(player);
         if(this.name != "UAV0"){
@@ -102,6 +99,7 @@ public class UAV : MonoBehaviour
         }
     }
 
+    // Function to simulate the reception of a new casualty in the communication between the drones
     void receivePlayerDetected(GameObject player){
         detectedPlayers.Add(player);
     }
@@ -183,7 +181,6 @@ public class UAV : MonoBehaviour
                 if(controller.GetComponent<Controller>().getDonePoints().Count > 0){
                     detectectionPlayer();
                 }
-                startOk = true;
                 followPath();
             }
 
