@@ -38,6 +38,20 @@ public class Controller : MonoBehaviour
             Time.timeScale = 1f;
         }
 
+        if( Input.GetKeyUp(KeyCode.Q) ){
+            Debug.Log("Quit");
+            Application.Quit();
+        }
+
+        if( Input.GetKeyUp(KeyCode.P) ){
+            if(Time.timeScale == 0){
+                Time.timeScale = 1;
+            }
+            else{
+                Time.timeScale = 0;
+            }
+        }
+
         float min = 0;
         float max = mapPoints.Count-1;
         float normalizedValue = ( (float) donePoints.Count - min) / (max - min);

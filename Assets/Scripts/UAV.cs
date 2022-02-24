@@ -28,6 +28,7 @@ public class UAV : MonoBehaviour
     void Start()
     {
         CreatePoints();
+        
     }
 
     // Creating a circle around the drone
@@ -107,6 +108,9 @@ public class UAV : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if( Input.GetKeyUp(KeyCode.X) ){
+            Debug.Log(this.name + " " + String.Join(", " , wayPoints));
+        }
         // When each drone has finished flying over its area it returns to its take-off point, 
         // except for the master drone which waits until the area has been flown over 100% to be sure that all casualties have been detected   
         if(finished == true){
